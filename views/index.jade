@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  nav
+      input(type="button", class="btn btn-lg btn-primary", onclick="tool1.activate()", value="Pencil")
+      input(type="button", class="btn btn-lg btn-primary", onclick="tool2.activate()", value="Clouds")
+      input(type="button", class="btn btn-lg btn-primary", onclick="tool3.activate()", value="Circles")
+      input(type="button", class="btn btn-lg btn-primary", onclick="tool4.activate()", value="Line")
+      input(type="text", class="picker", id="colorPicker")
+  canvas#draw
+  script(type='text/paperscript', src='/javascripts/draw.js', canvas='draw')
+  script(type='text/javascript').
+      $("#colorPicker").spectrum({
+          color: "#000",
+          showAlpha: true,
+          showPalette: true
+      });

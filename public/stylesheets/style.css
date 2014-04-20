@@ -1,0 +1,16 @@
+body {
+  padding: 10px 10px 0 10px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#draw {
+    margin:0;
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 100%;
+}
+
