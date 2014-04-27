@@ -12,7 +12,7 @@ var path = require('path');
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 49153);
+app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon('./node_modules/express/node_modules/connect/node_modules/static-favicon/favicon.ico'));
@@ -35,16 +35,42 @@ var io= require('socket.io').listen(server, function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+var usernames = {};
+
 io.sockets.on('connection', function(socket) {
+	//user starts path
     socket.on( 'startPath', function( data, sessionId ) {
         socket.broadcast.emit( 'startPath', data, sessionId );
 
     });
 
-    // A User continues a path
+    //user continues path
     socket.on( 'continuePath', function( data, sessionId ) {
         socket.broadcast.emit( 'continuePath', data, sessionId );
 
+    });
+
+    //user clears canvas
+    socket.on('clearCanvas', function() {
+    	socket.broadcast.emit('clearCanvas');
+    });
+
+    //user sends chat
+    socket.on('sendchat', function(data) {
+    	io.sockets.emit('updatechat', socket.username, data);
+    });
+
+    //adduser
+    socket.on('adduser', function(username) {
+    	socket.username = username;
+    	usernames[username] = username;
+    	socket.emit('updatechat', '', ' you have connected');
+    	socket.broadcast.emit('updatechat', '',' '+username + ' has connected');
+    });
+
+    socket.on('disconnect', function() {
+    	delete usernames[socket.username];
+    	socket.broadcast.emit('updatechat', '', socket.username+ ' has disconnected');
     });
 
 });

@@ -2,12 +2,22 @@ extends layout
 
 block content
   nav
-      input(type="button", class="btn btn-lg btn-primary", onclick="tool1.activate()", value="Pencil")
-      input(type="button", class="btn btn-lg btn-primary", onclick="tool2.activate()", value="Clouds")
-      input(type="button", class="btn btn-lg btn-primary", onclick="tool3.activate()", value="Circles")
-      input(type="button", class="btn btn-lg btn-primary", onclick="tool4.activate()", value="Line")
+      input(type="button", id="pencil", class="pencil btn")
+      input(type="button", id="clouds", class="clouds btn")
+      input(type="button", id="circles", class="circles btn")
+      input(type="button", id="line", class="lines btn")
       input(type="text", class="picker", id="colorPicker")
+      input(type="button", class="clear", id="clear" value="Clear")
   canvas#draw
+  #chatcontainer
+      #chat
+      .controls
+          input(type='button', id="send", class="clear" value='Send')
+          input(type="text", id="data")
+  #nameContainer
+      h2 Please enter your name
+      input(type="text", id="name", placeholder="Name")
+      input(type='button', id="submitName", class="clear" value='Submit')
   script(type='text/paperscript', src='/javascripts/draw.js', canvas='draw')
   script(type='text/javascript').
       $("#colorPicker").spectrum({

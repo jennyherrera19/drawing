@@ -5,23 +5,62 @@
 var paths = {};
 var sessionId = io.socket.sessionid;
 
+$("#pencil").click(function() {
+    tool1.activate();
+    $("#colorPicker").spectrum("enable");
+    $("#pencil").addClass('selected');
+    $("#clouds").removeClass('selected');
+    $("#circles").removeClass('selected');
+    $("#line").removeClass('selected');
+});
+$("#clouds").click(function() {
+    tool2.activate();
+    $("#colorPicker").spectrum("enable");
+    $("#pencil").removeClass('selected');
+    $("#clouds").addClass('selected');
+    $("#circles").removeClass('selected');
+    $("#line").removeClass('selected');
+});
+$("#circles").click(function() {
+    tool3.activate();
+    $("#colorPicker").spectrum("disable");
+    $("#pencil").removeClass('selected');
+    $("#clouds").removeClass('selected');
+    $("#circles").addClass('selected');
+    $("#line").removeClass('selected');
+});
+$("#line").click(function() {
+    tool4.activate();
+    $("#colorPicker").spectrum("enable");
+    $("#pencil").removeClass('selected');
+    $("#clouds").removeClass('selected');
+    $("#circles").removeClass('selected');
+    $("#line").addClass('selected');
+});
+
 //random color generator and random opacity
 function randomColor() {
-    return Math.random()
+    return {
+        red: 0,
+        green: Math.random(),
+        blue: Math.random(),
+        alpha: (Math.random() * 0.5) + 0.05
+        };
 }
 
-function randomOpacity() {
-    return (Math.random() * 0.25) + 0.05;
+$("#clear").click(function() {
+    clearCanvas();
+    view.draw();
+    io.emit('clearCanvas');
+});
+
+function clearCanvas() {
+    project.activeLayer.removeChildren();
 }
 
-var color= {
-  "red": randomColor(),
-  "green": randomColor(),
-  "blue": randomColor(),
-  "opacity": randomOpacity()
-};
 var path;
 var color;
+
 function onMouseDown(event) {
     /*path = new Path();
     path.strokeColor = 'yellow';
@@ -36,13 +75,12 @@ function onMouseDown(event) {
     emit("startPath", data, sessionId);
 }
 
+//pencil
 tool1 = new Tool();
 tool1.onMouseDown = onMouseDown;
 
 tool1.onMouseDrag = function(event) {
     var point = event.point;
-    //path.add(event.point);
-    //data.tool = 'tool1';
     var data = {
         point: point,
         tool: "tool1"
@@ -51,8 +89,9 @@ tool1.onMouseDrag = function(event) {
     emit("continuePath",data, sessionId);
 }
 
+//clouds
 tool2 = new Tool();
-tool2.minDistance = 50;
+tool2.minDistance = 25;
 tool2.onMouseDown = onMouseDown;
 
 tool2.onMouseDrag = function(event) {
@@ -66,6 +105,7 @@ tool2.onMouseDrag = function(event) {
 
 }
 
+//circles
 tool3 = new Tool();
 tool3.maxDistance = 50;
 tool3.onMouseDown = onMouseDown;
@@ -73,11 +113,10 @@ tool3.onMouseDrag = function(event) {
 
     var radius = event.delta.length / 2;
     var circle = new Path.Circle(event.middlePoint, radius);
-    color = $("#colorPicker").spectrum("get").toString();
     var data = {
         radius: radius,
         circle: circle,
-        color: color,
+        color: randomColor(),
         tool: "tool3"
     }
     //circle.fillColor = randomColor();
@@ -86,6 +125,7 @@ tool3.onMouseDrag = function(event) {
 
 }
 
+//line
 tool4 = new Tool();
 tool4.onMouseDown = onMouseDown;
 
@@ -120,7 +160,7 @@ function continuePath(data, sessionId) {
         path.arcTo(data.point);
     }
     else if (data.tool === "tool3"){
-        data.circle.fillColor = data.color;
+        data.circle.fillColor = new RgbColor( data.color.red, data.color.green, data.color.blue, data.color.alpha );
     }
     else if (data.tool === "tool4"){
         path.add(data.point);
@@ -157,5 +197,10 @@ io.on('continuePath', function(data, sessionId) {
         data.circle = arrto(data.circle);
     }
    continuePath(data, sessionId);
+    view.draw();
+});
+
+io.on('clearCanvas', function() {
+    clearCanvas();
     view.draw();
 });
